@@ -2,43 +2,52 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Imagen aleatoria de Google Drive</title>
+  <title>Depuración Imagen Aleatoria</title>
   <style>
-    body { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background: #fafaff;}
-    img { max-width: 90vw; max-height: 80vh; border-radius: 16px; box-shadow: 0 4px 24px #0002;}
-    .loader { font-family: sans-serif; font-size: 1.3em; margin-bottom: 20px; color: #888;}
+    body { font-family: sans-serif; padding: 20px; background: #f9f9ff; }
+    img { max-width: 80vw; max-height: 60vh; border: 2px solid #333; margin: 20px 0; }
+    pre { background: #eee; padding: 8px; border-radius: 8px; }
+    .error { color: red; }
   </style>
 </head>
 <body>
-  <div class="loader" id="loader">Cargando imagen aleatoria...</div>
-  <img id="random-image" src="" alt="Imagen aleatoria" style="display:none">
+  <h2>Depuración Imagen Aleatoria Google Drive</h2>
+  <div id="json"></div>
+  <div id="link"></div>
+  <img id="imagen" src="" alt="Imagen aleatoria" style="display:none">
+  <div id="error" class="error"></div>
   <script>
-    // Pega aquí tu URL de Apps Script (la que devuelve el JSON)
-    const API_URL = "https://script.google.com/macros/s/AKfycbzTZZYVj4GkTnOFDGkwOHqJQGq5hBtXekg-zZBCTgCZlPzyYNmH6_XGYYQqB4GtI-wIPw/exec";
+    const API_URL = "https://script.google.com/macros/s/AKfycby0XgNjFhjgtSQA4ttI5ZK-gJLCIbRFZI6eMuM2d_DqEuD4hS4nefjhDpsjK8I791lXRA/exec";
 
     fetch(API_URL)
-      .then(response => response.json())
-      .then(images => {
-        if (!images || images.length === 0) {
-          document.getElementById("loader").innerText = "No hay imágenes en la carpeta.";
+      .then(r => r.json())
+      .then(data => {
+        // Muestra el JSON recibido en pantalla
+        document.getElementById("json").innerHTML = "<b>JSON recibido:</b><pre>" + JSON.stringify(data, null, 2) + "</pre>";
+
+        if (!data || !data.length) {
+          document.getElementById("error").innerText = "No hay imágenes disponibles.";
           return;
         }
         // Escoge una imagen aleatoria
-        const idx = Math.floor(Math.random() * images.length);
-        const img = images[idx];
-        // Intenta cargar la imagen
-        const imageEl = document.getElementById("random-image");
-        imageEl.onload = () => {
-          imageEl.style.display = "";
-          document.getElementById("loader").style.display = "none";
+        const imgObj = data[Math.floor(Math.random() * data.length)];
+        document.getElementById("link").innerHTML = `<b>Enlace de imagen:</b> <a href="${imgObj.url}" target="_blank">${imgObj.url}</a>`;
+
+        const imgTag = document.getElementById("imagen");
+        imgTag.src = imgObj.url;
+        imgTag.style.display = "block";
+
+        imgTag.onload = function() {
+          document.getElementById("error").innerText = "";
         };
-        imageEl.onerror = () => {
-          document.getElementById("loader").innerText = "La imagen no está disponible o los permisos no son públicos.";
+        imgTag.onerror = function(e) {
+          document.getElementById("error").innerText = "La imagen no está disponible o no es pública.\nPrueba el enlace directo arriba.";
+          console.log("Error al cargar imagen:", imgObj.url, e);
         };
-        imageEl.src = img.url;
       })
       .catch(error => {
-        document.getElementById("loader").innerText = "Error cargando la imagen: " + error;
+        document.getElementById("error").innerText = "Error al cargar el JSON del Apps Script: " + error;
+        console.log("Fallo en fetch:", error);
       });
   </script>
 </body>
