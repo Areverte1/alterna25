@@ -1,0 +1,29 @@
+name: Genera lista automática de imágenes
+
+on:
+  push:
+    paths:
+      - 'imagenes/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Generar imagenes.js
+        run: |
+          ls imagenes > imagenes.js
+          sed -i '1s/^/window.imagenes = [\n/' imagenes.js
+          sed -i 's/$/",/' imagenes.js
+          sed -i 's/^/  "/' imagenes.js
+          sed -i '$ s/,$/\n];/' imagenes.js
+
+      - name: Commit y push de imagenes.js
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "GitHub Actions"
+          git add imagenes.js
+          git commit -m "Actualiza lista automática de imágenes" || exit 0
+          git push
