@@ -2,53 +2,29 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Depuración Imagen Aleatoria</title>
+  <title>Imagen aleatoria</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #f9f9ff; }
-    img { max-width: 80vw; max-height: 60vh; border: 2px solid #333; margin: 20px 0; }
-    pre { background: #eee; padding: 8px; border-radius: 8px; }
-    .error { color: red; }
+    body { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; background: #f7f7fa;}
+    img { max-width: 90vw; max-height: 70vh; border-radius: 16px; box-shadow: 0 4px 24px #0002; }
+    .btn { margin-top: 30px; font-size: 1.1em; padding: 8px 18px; border: none; border-radius: 10px; background: #518aff; color: white; cursor: pointer; box-shadow: 0 2px 8px #0001;}
+    .info { margin-bottom: 20px; color: #666; font-size: 1.2em;}
   </style>
 </head>
 <body>
-  <h2>Depuración Imagen Aleatoria Google Drive</h2>
-  <div id="json"></div>
-  <div id="link"></div>
-  <img id="imagen" src="" alt="Imagen aleatoria" style="display:none">
-  <div id="error" class="error"></div>
+  <div class="info">Imagen aleatoria del grupo</div>
+  <img id="random-image" src="" alt="Imagen aleatoria">
+  <button class="btn" onclick="mostrarAleatoria()">Ver otra imagen</button>
+  <script src="imagenes.js"></script>
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycby0XgNjFhjgtSQA4ttI5ZK-gJLCIbRFZI6eMuM2d_DqEuD4hS4nefjhDpsjK8I791lXRA/exec";
-
-    fetch(API_URL)
-      .then(r => r.json())
-      .then(data => {
-        // Muestra el JSON recibido en pantalla
-        document.getElementById("json").innerHTML = "<b>JSON recibido:</b><pre>" + JSON.stringify(data, null, 2) + "</pre>";
-
-        if (!data || !data.length) {
-          document.getElementById("error").innerText = "No hay imágenes disponibles.";
-          return;
-        }
-        // Escoge una imagen aleatoria
-        const imgObj = data[Math.floor(Math.random() * data.length)];
-        document.getElementById("link").innerHTML = `<b>Enlace de imagen:</b> <a href="${imgObj.url}" target="_blank">${imgObj.url}</a>`;
-
-        const imgTag = document.getElementById("imagen");
-        imgTag.src = imgObj.url;
-        imgTag.style.display = "block";
-
-        imgTag.onload = function() {
-          document.getElementById("error").innerText = "";
-        };
-        imgTag.onerror = function(e) {
-          document.getElementById("error").innerText = "La imagen no está disponible o no es pública.\nPrueba el enlace directo arriba.";
-          console.log("Error al cargar imagen:", imgObj.url, e);
-        };
-      })
-      .catch(error => {
-        document.getElementById("error").innerText = "Error al cargar el JSON del Apps Script: " + error;
-        console.log("Fallo en fetch:", error);
-      });
+    function mostrarAleatoria() {
+      if(typeof window.imagenes === "undefined" || !window.imagenes.length) {
+        alert("No hay imágenes disponibles.");
+        return;
+      }
+      const idx = Math.floor(Math.random() * window.imagenes.length);
+      document.getElementById("random-image").src = "imagenes/" + window.imagenes[idx];
+    }
+    mostrarAleatoria();
   </script>
 </body>
 </html>
