@@ -17,12 +17,12 @@
   <script src="imagenes.js"></script>
   <script>
     function mostrarAleatoria() {
-      if(typeof window.imagenes === "undefined" || !window.imagenes.length) {
+      if(typeof window.imagenes === "undefined" || !window.images.length) {
         alert("No hay imágenes disponibles.");
         return;
       }
       const idx = Math.floor(Math.random() * window.imagenes.length);
-      document.getElementById("random-image").src = "imagenes/" + window.imagenes[idx];
+      document.getElementById("random-image").src = "images/" + window.imagenes[idx];
     }
     mostrarAleatoria();
   </script>
