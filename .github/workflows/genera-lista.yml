@@ -3,7 +3,7 @@ name: Genera lista automática de imágenes
 on:
   push:
     paths:
-      - 'imagenes/**'
+      - 'images/**'
 
 jobs:
   build:
